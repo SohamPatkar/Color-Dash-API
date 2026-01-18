@@ -40,5 +40,7 @@ Thumbs.db
 tmp/
 temp/
 
-# Optional: dotenv example (if you ever add it)
-# .env.example
+#Optional: dotenv example (if you ever add it)
+.env.example
+.env.*
+.env
