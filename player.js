@@ -1,6 +1,7 @@
 const express = require("express");
 const supabase = require("./supabase");
 const router = express.Router();
+const authMiddleware = require("./middleware/auth");
 
 router.get("/", async (req, res) => {
   try {
@@ -26,9 +27,14 @@ router.post("/submit-score", async (req, res) => {
   }
 });
 
-router.put("/update-score/:id", async (req, res) => {
+router.put("/update-score/:id", authMiddleware, async (req, res) => {
+  const userIdFromToken = req.user.id;
   const { id } = req.params;
   const { score } = req.body;
+
+  if(userIdFromToken != id){
+    return res.status(403).json({ message: "Forbidden: You can only update your own score" });
+  }
 
   try{
     const { data, error} = await supabase.from("players").update({ score }).eq("id", id);
