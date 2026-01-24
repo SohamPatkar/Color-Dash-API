@@ -10,7 +10,6 @@ router.post("/signup", async (req, res) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  try {
     const { data, error } = await supabase
       .from("players")
       .insert([{ name: username, score: 0, hashedpassword: hashedPassword }]);
@@ -20,9 +19,6 @@ router.post("/signup", async (req, res) => {
     }
 
     res.status(201).send({ message: "User created successfully" });
-  } catch (err) {
-    return res.status(500).send({ message: err.message });
-  }
 });
 
 router.post("/login", async (req, res) => {
@@ -51,14 +47,14 @@ router.post("/login", async (req, res) => {
   if (isPasswordValid) {
     const token = jwt.sign(
       {
-        id : data[0].id,
+        id: data[0].id,
         username: data[0].name,
         password: hashPassword,
       },
       process.env.JWT_SECRET,
       {
         expiresIn: "1h",
-      },
+      }
     );
 
     res.json({ token });
