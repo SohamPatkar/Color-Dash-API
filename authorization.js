@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const express = require("express");
 const supabase = require("./supabase");
 
@@ -34,13 +35,35 @@ router.post("/login", async (req, res) => {
     .select("*")
     .eq("name", username);
 
-  console.log(data);
+  if (data.length === 0) {
+    return res.json({ message: "Invalid username or password" });
+  }
 
   if (error) {
     return res.json({ message: error.message });
   }
 
-  res.json({ message: "Login successful" });
+  const isPasswordValid = await bcrypt.compare(
+    password,
+    data[0].hashedpassword,
+  );
+
+  if (isPasswordValid) {
+    const token = jwt.sign(
+      {
+        username: data[0].name,
+        password: hashPassword,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      },
+    );
+
+    res.json({ token });
+  } else {
+    return res.json({ message: "Invalid password" });
+  }
 });
 
 module.exports = router;
