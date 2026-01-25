@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const playerRoutes = require("./player");
 const authRoutes = require("./authorization");
+const authMiddleware = require("./middleware/auth");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,7 +11,7 @@ app.use(express.json());
 app.use("/player", playerRoutes);
 app.use("/auth", authRoutes);
 
-app.get("/health", (req, res) => {
+app.get("/health", authMiddleware, (req, res) => {
   res.send("Server is healthy");
 });
 
