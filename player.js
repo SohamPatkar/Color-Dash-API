@@ -27,25 +27,23 @@ router.post("/submit-score", async (req, res) => {
   }
 });
 
-router.put("/update-score/:id", authMiddleware, async (req, res) => {
+router.put("/increment-score", authMiddleware, async (req, res) => {
   const userIdFromToken = req.user.id;
-  const { id } = req.params;
   const { score } = req.body;
 
-  if(userIdFromToken != id){
-    return res.status(403).json({ message: "Forbidden: You can only update your own score" });
-  }
+    const { data, error} = await supabase.rpc("increment_score", {
+      player_id: userIdFromToken,
+      points : score
+    });
 
-  try{
-    const { data, error} = await supabase.from("players").update({ score }).eq("id", id);
+    if(error){
+      return res.status(400).send({ message: error.message });
+    }
 
     res.json({
       message: "Score updated successfully",
       score: data
     })
-  }catch(err){
-    res.status(500).send({ message: err.message });
-  }
 });
 
 router.get("/leaderboard", async (req, res) => {
