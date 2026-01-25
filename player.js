@@ -1,7 +1,8 @@
 const express = require("express");
 const supabase = require("./supabase");
-const router = express.Router();
 const authMiddleware = require("./middleware/auth");
+
+const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
